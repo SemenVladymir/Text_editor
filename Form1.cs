@@ -21,6 +21,8 @@ namespace Text_editor
         bool bUndo = false;
         bool bRedo = false;
         bool capSymbol = false;
+        bool autoNumeration = false;
+        int number = 1;
         public Form1()
         {
             InitializeComponent();
@@ -159,6 +161,14 @@ namespace Text_editor
             settings.Controls.Add(FirstToUp);
             FirstToUp.Click += FirstToUp_Click;
 
+            AutoNumeration = new CheckBox();
+            AutoNumeration.Checked = false;
+            AutoNumeration.Text = "Set autonumeration after a colon";
+            AutoNumeration.Size = new Size(AutoNumeration.Text.Length * 12, 30);
+            AutoNumeration.Location = new Point(Font.Width + alignment.Width + find.Width + correct.Width + 90, 47);
+            settings.Controls.Add(AutoNumeration);
+            AutoNumeration.Click += AutoNumeration_Click;
+
 
             settings.Size = new Size(Width - 30, Height - textBox.Height - 100);
             settings.BackColor = Color.AliceBlue;
@@ -183,6 +193,16 @@ namespace Text_editor
 
 
             this.Resize += Form1_Resize;
+        }
+
+        private void AutoNumeration_Click(object sender, EventArgs e)
+        {
+            if (AutoNumeration.Checked)
+            {
+                autoNumeration = true;
+            }
+            else
+                autoNumeration = false;
         }
 
         private void BChange_Click(object sender, EventArgs e)
@@ -219,6 +239,8 @@ namespace Text_editor
                 changes = MyStack.MainStackPull();
                 if (changes!=null && !changes.TypeOfChange)
                 {
+                    if (string.IsNullOrEmpty(sample))
+                        sample = changes.ChangeText;
                     textBox.Text = sample.Insert(changes.Position, changes.ChangeText);
                     changes.TypeOfChange = !changes.TypeOfChange;
                     MyStack.BackStackAdd(changes);
@@ -294,6 +316,16 @@ namespace Text_editor
                         capSymbol = false;
                         string text1 = textBox.Text.Substring(0, textBox.Text.Length - 1);
                         textBox.Text = text1 + char.ToUpper(textBox.Text[textBox.Text.Length - 1]);
+                        textBox.SelectionStart = textBox.Text.Length;
+                    }
+                    if (symb == ':' && autoNumeration)
+                    {
+                        textBox.Text = textBox.Text + "\r\n" + $"{number++}) ";
+                        textBox.SelectionStart = textBox.Text.Length;
+                    }
+                    if (symb == '\n' && autoNumeration)
+                    {
+                        textBox.Text = textBox.Text + "\n" + $"{number++}) ";
                         textBox.SelectionStart = textBox.Text.Length;
                     }
                 }
@@ -397,6 +429,7 @@ namespace Text_editor
         }
 
         CheckBox FirstToUp;
+        CheckBox AutoNumeration;
 
         TextBox textBox;
         TextBox fontSize;
