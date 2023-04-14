@@ -20,6 +20,7 @@ namespace Text_editor
         MemoryStack MyStack = new MemoryStack();
         bool bUndo = false;
         bool bRedo = false;
+        bool capSymbol = false;
         public Form1()
         {
             InitializeComponent();
@@ -255,9 +256,29 @@ namespace Text_editor
 
         private void TextBox_TextChanged(object sender, EventArgs e)
         {
-            bool tmp = false;
-            if (sample != null && sample!="" && !bUndo && !bRedo)
+            if (FirstToUp.Checked && textBox.Text.Length == 1 && Convert.ToInt32(textBox.Text[textBox.Text.Length - 1]) > 64)
             {
+                textBox.Text = char.ToUpper(textBox.Text[textBox.Text.Length - 1]).ToString();
+                textBox.SelectionStart = textBox.Text.Length;
+            }
+            else if (FirstToUp.Checked && textBox.Text.Length == 1)
+                capSymbol = true;
+            bool tmp = false;
+            if (!string.IsNullOrEmpty(sample) && !bUndo && !bRedo)
+            {
+                if (textBox.Text.Length > 0)
+                {
+                    char symb = textBox.Text[textBox.Text.Length - 1];
+                    if (FirstToUp.Checked && (symb == '\n' || symb == '.' || symb == '?' || symb == '!'))
+                        capSymbol = true;
+                    if (Convert.ToInt32(textBox.Text[textBox.Text.Length - 1]) > 64 && capSymbol)
+                    {
+                        capSymbol = false;
+                        string text1 = textBox.Text.Substring(0, textBox.Text.Length - 1);
+                        textBox.Text = text1 + char.ToUpper(textBox.Text[textBox.Text.Length - 1]);
+                        textBox.SelectionStart = textBox.Text.Length;
+                    }
+                }
                 int length = textBox.Text.Length - sample.Length;
                 if (length > 0)
                 {
