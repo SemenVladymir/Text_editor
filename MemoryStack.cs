@@ -42,5 +42,9 @@ namespace Text_editor
             else
                 return null;
         }
+
+        public void MainStackClear() => MainStack.Clear ();
+
+        public void BackStackClear() => BackStack.Clear();
     }
 }

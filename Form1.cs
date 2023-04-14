@@ -222,13 +222,22 @@ namespace Text_editor
                     textBox.Text = sample.Insert(changes.Position, changes.ChangeText);
                     changes.TypeOfChange = !changes.TypeOfChange;
                     MyStack.BackStackAdd(changes);
+                    redo.ForeColor = Color.Blue;
+                    redo.BackColor = Color.AliceBlue;
                 }
                 else if (changes!=null)
                 {
                     textBox.Text = sample.Remove(changes.Position, changes.ChangeText.Length);
                     changes.TypeOfChange = !changes.TypeOfChange;
                     MyStack.BackStackAdd(changes);
+                    redo.ForeColor = Color.Blue;
+                    redo.BackColor = Color.AliceBlue;
                 }
+            }
+            if (MyStack.MainStack.Count == 0)
+            {
+                undo.ForeColor = Color.Black;
+                undo.BackColor = Color.GhostWhite;
             }
             bUndo = false;
         }
@@ -242,15 +251,24 @@ namespace Text_editor
                 if (changes != null && !changes.TypeOfChange)
                 {
                     textBox.Text = sample.Insert(changes.Position, changes.ChangeText);
-                    //MyStack.MainStackAdd(!changes.TypeOfChange, changes.ChangeText, changes.Position);
+                    MyStack.MainStackAdd(!changes.TypeOfChange, changes.ChangeText, changes.Position);
+                    undo.ForeColor = Color.Blue;
+                    undo.BackColor = Color.AliceBlue;
                 }
                 else if (changes!=null)
                 {
 
                     textBox.Text = sample.Remove(changes.Position, changes.ChangeText.Length);
-                    //MyStack.MainStackAdd(!changes.TypeOfChange, changes.ChangeText, changes.Position);
+                    MyStack.MainStackAdd(!changes.TypeOfChange, changes.ChangeText, changes.Position);
+                    undo.ForeColor = Color.Blue;
+                    undo.BackColor = Color.AliceBlue;
                 }
             }
+            if (MyStack.BackStack.Count == 0)
+                {
+                    redo.ForeColor = Color.Black;
+                    redo.BackColor = Color.GhostWhite;
+                }
             bRedo = false;
         }
 
@@ -287,12 +305,16 @@ namespace Text_editor
                         if (textBox.Text[i] != sample[i])
                         {
                             MyStack.MainStackAdd(true, textBox.Text.Substring(i, length), i);
+                            undo.ForeColor = Color.Blue;
+                            undo.BackColor = Color.AliceBlue;
                             i = textBox.Text.Length;
                             tmp = true;
                         }
                         if (i == (sample.Length - 1) && !tmp)
                         {
                             MyStack.MainStackAdd(true, textBox.Text.Substring(i+1, length), i+1);
+                            undo.ForeColor = Color.Blue;
+                            undo.BackColor = Color.AliceBlue;
                         }
                     }
                 }
@@ -303,12 +325,16 @@ namespace Text_editor
                         if (textBox.Text[i] != sample[i])
                         {
                             MyStack.MainStackAdd(false, sample.Substring(i, length * -1), i);
+                            undo.ForeColor = Color.Blue;
+                            undo.BackColor = Color.AliceBlue;
                             i = textBox.Text.Length;
                             tmp = true;
                         }
                         if (i == (textBox.Text.Length - 1) && !tmp)
                         {
                             MyStack.MainStackAdd(false, sample.Substring(i + 1, length * -1), i + 1);
+                            undo.ForeColor = Color.Blue;
+                            undo.BackColor = Color.AliceBlue;
                         }
                     }
                 }
@@ -344,6 +370,12 @@ namespace Text_editor
         private void Save_Click(object sender, EventArgs e)
         {
             File.WriteAllText(fileName, textBox.Text);
+            MyStack.MainStackClear();
+            MyStack.BackStackClear();
+            redo.ForeColor = Color.Black;
+            redo.BackColor = Color.GhostWhite;
+            undo.ForeColor = Color.Black;
+            undo.BackColor = Color.GhostWhite;
         }
 
         private void Load_Click(object sender, EventArgs e)
